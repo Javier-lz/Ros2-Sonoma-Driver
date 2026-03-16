@@ -1,0 +1,69 @@
+<?xml version="1.0"?>
+<robot xmlns:xacro="http://www.ros.org/wiki/xacro" >
+
+    <xacro:macro name="camera" params="name x y z ">
+        <link name="${name}_link">
+            <visual>
+                <geometry>
+                    <box size="${camera_width} ${camera_length} ${camera_height}"/>
+                </geometry>
+                <material name="black">
+                    <color rgba="0 0 0 1"/>
+                </material>
+            </visual>
+            <collision>
+                <geometry>
+                    <box size="${camera_width} ${camera_length} ${camera_height}"/>
+                </geometry>
+            </collision>
+
+            <xacro:inertial_box mass="${camera_mass}" x="${camera_width}" y="${camera_length}" z="${camera_height}">
+                <origin xyz="0 0 0" rpy="0 0 0"/>
+            </xacro:inertial_box>
+            
+            
+        </link>
+
+        <joint name="${name}_joint" type="fixed">
+            <parent link="body_link"/>
+            <child link="${name}_link"/>
+            <origin xyz="${x} ${y} ${z}" rpy="0 0 0"/>
+        </joint>
+
+        <gazebo reference="${name}_link">
+
+            <sensor name="camera" type="camera" >
+                <always_on>true</always_on>
+                <update_rate>30.0</update_rate>
+                <visualize>true</visualize>
+                <camera>
+                    <horizontal_fov>1.047</horizontal_fov>
+                    <image>
+                        <width>640</width>
+                        <height>480</height>
+                        <format>R8G8B8</format>
+                    </image>
+                    <clip>
+                        <near>0.1</near>
+                        <far>100</far>
+                    </clip>
+            </camera>
+            <plugin name="camera_plugin" filename="libgazebo_ros_camera.so">
+                <robotNamespace>/four_wheels_robot</robotNamespace>
+                <cameraName>camera</cameraName>
+                <imageTopicName>image_raw</imageTopicName>
+                <cameraInfoTopicName>camera_info</cameraInfoTopicName>
+                <frameName>${name}_link</frameName>
+                <ros>
+                    <remapping>image_raw:=/${name}/image_raw</remapping>
+                </ros>
+            </plugin>
+            <!-- Sensor camera -->
+            </sensor>
+        </gazebo>
+    </xacro:macro>
+
+    <xacro:camera name="camera" x="${chasis_width/2}" y="0" z="0.0"/>
+
+    
+</robot>
