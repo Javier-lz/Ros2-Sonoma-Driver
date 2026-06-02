@@ -6,6 +6,7 @@ from cv_bridge import CvBridge
 import cv2
 import torch
 import torch.nn as nn
+from four_wheels_robot_nn.config import *
 
 # --- 1. THE BRAIN (PyTorch Model) ---
 class PriusDriverNet(nn.Module):
@@ -14,9 +15,9 @@ class PriusDriverNet(nn.Module):
         
         # Image Branch (CNN) - Expects 64x64 2 channel input 
         self.image_branch = nn.Sequential( 
-            nn.Conv2d(2, 16, kernel_size=3, stride=2), 
+            nn.Conv2d(conv_attr_1), 
             nn.ReLU(),
-            nn.Conv2d(16, 32, kernel_size=3, stride=2),
+            nn.Conv2d(conv_attr_2),
             nn.ReLU(),
             nn.Flatten(),
         ) 
@@ -24,20 +25,25 @@ class PriusDriverNet(nn.Module):
         # Telemetry Branch (MLP) 
         # Inputs: [Linear Velocity X, Angular Velocity Z]
         self.telemetry_branch = nn.Sequential(
-            nn.Linear(2, 16),
+            nn.Linear(2, number_of_neurons_1),
             nn.ReLU(),
+            nn.Linear(number_of_neurons_1,number_of_neurons_2),
+            nn.Sigmoid(),
+            nn.Linear
         )
 
        
         # Inside __init__
         
-        dummy_input = torch.zeros(1, 2, 64, 64)
+        dummy_input = torch.zeros(1, 1, y_max-y_min,x_max-x_min)
         n_flattened = self.image_branch(dummy_input).shape[1]
         # Now use n_flattened inside your Linear layer!
         self.decision_gate = nn.Sequential(
-            nn.Linear(n_flattened + 16, 64),
+            nn.Linear(n_flattened , number_of_neurons_1),
             nn.ReLU(),
-            nn.Linear(64, 2) # Outputs: [Throttle/Brake, Steering Angle]
+            nn.Linear(number_of_neurons_1,number_of_neurons_2),
+            nn.Sigmoid(),
+            nn.Linear(number_of_neurons_2, number_of_outputs) # Outputs: [Throttle/Brake, Steering Angle]
         )
         self.buffer = RolloutBuffer()
 

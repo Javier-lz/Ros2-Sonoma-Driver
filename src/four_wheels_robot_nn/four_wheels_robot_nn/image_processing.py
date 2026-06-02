@@ -8,8 +8,10 @@ from rclpy.node import Node
 from sensor_msgs.msg import Image
 import cv_bridge
 import numpy as np
-
+from four_wheels_robot_nn.config import * 
 import torch
+import random 
+color_encodings=["bgr8","rgb8"]
 class ImageProcessingNode(Node):
     def __init__(self):
         super().__init__('image_processing_node')
@@ -18,8 +20,8 @@ class ImageProcessingNode(Node):
         self.bridge = CvBridge()
         
         
-        self.y_min, self.y_max = 64, 128
-        self.x_min, self.x_max = 0,128
+        self.y_min, self.y_max = y_min, y_max
+        self.x_min, self.x_max = x_min,x_max
         
         self.subscription = self.create_subscription(
             Image,
@@ -30,12 +32,15 @@ class ImageProcessingNode(Node):
         self.get_logger().info("YOLO Node Started. Waiting for images...")
 
     def image_callback(self, msg: Image):
+        encoding=color_encodings[random.randint(0,1)]
         try: 
             # Convert ROS Image to OpenCV
-            raw_image = self.bridge.imgmsg_to_cv2(msg, desired_encoding="mono8")
+            
+            raw_image = self.bridge.imgmsg_to_cv2(msg, desired_encoding=encoding)
             raw_image=cv.resize(raw_image,[128,128])
             raw_image = raw_image[self.y_min:self.y_max, self.x_min:self.x_max]
-            _, raw_image = cv.threshold(raw_image, 60, 255, cv.THRESH_TOZERO)
+            last_img= cv.cvtColor(raw_image,cv.COLOR_BGR2HSV)
+
             # Run Inference (Stream=True is faster for video)
             
             
@@ -90,14 +95,15 @@ class ImageProcessingNode(Node):
             # # Display the image
             try:
                 
-                message = self.bridge.cv2_to_imgmsg(raw_image,encoding="mono8")
+                message = self.bridge.cv2_to_imgmsg(raw_image,encoding=encoding)
                 self.publisher_.publish(message)
             except: 
                 self.get_logger().info("Message not published ")
             
             big_view = cv.resize(raw_image, (512, 256), interpolation=cv.INTER_NEAREST)
 
-            cv.imshow("Road d", big_view)  
+            # cv.imshow("Road d", big_view)  
+            # cv.imshow("HSV ", last_img)
         
         # This is critical: waitKey(1) allows the GUI to refresh
         
