@@ -3,4 +3,4 @@
 *log/
 *.vscode/
 *venv/
-gsrc/four_wheels_robot_nn/four_wheels_robot_nn/data/
+src/four_wheels_robot_nn/four_wheels_robot_nn/data/
