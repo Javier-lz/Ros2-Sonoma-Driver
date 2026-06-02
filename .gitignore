@@ -4,3 +4,4 @@
 *.vscode/
 *venv/
 src/four_wheels_robot_nn/four_wheels_robot_nn/data/
+data/
