@@ -13,7 +13,7 @@ setup(
             ['resource/' + package_name]),
         ('share/' + package_name, ['package.xml']),
         (os.path.join('share', package_name, 'models'), glob('models/*')),
-        (os.path.join('share', package_name, 'launch'), glob('launch/*'))
+        (os.path.join('share', package_name, 'launch'), glob('launch/*launch.py'))
     ],
     install_requires=['setuptools',
                       'ultralytics',
@@ -32,7 +32,8 @@ setup(
         'console_scripts': [
             'processorimg = four_wheels_robot_nn.image_processing:main',
             'training_node = four_wheels_robot_nn.training:main',
-            'datagathering = four_wheels_robot_nn.data_gather_node:main'
+            'datagathering = four_wheels_robot_nn.data_gather_node:main',
+            'controller_ai = four_wheels_robot_nn.controller_node:main'
         ],
     },
 )

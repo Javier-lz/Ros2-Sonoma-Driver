@@ -33,7 +33,7 @@ public:
             this->publisher_->publish(message);
     
           };
-        _ = this->create_wall_timer(
+        _ this->create_wall_timer(
             std::chrono::milliseconds(2500), topic_callback);
         
     }

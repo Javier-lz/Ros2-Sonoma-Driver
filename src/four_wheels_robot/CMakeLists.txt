@@ -48,6 +48,7 @@ install(
     urdf
     config
     launch
+    models
     worlds
   DESTINATION
     share/${PROJECT_NAME}/

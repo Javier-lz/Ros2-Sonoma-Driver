@@ -43,8 +43,9 @@ class DataGatherer(Node):
             
         else:
             self.image_path=self.path  /"batch"
-            self.image_path.mkdir(parents=True,exist_ok=True)
-            shutil.rmtree(self.image_path)
+            self.get_logger().info("Tha paths are accessed???? ")
+            if self.image_path.exists():
+                shutil.rmtree(self.image_path)
             self.image_path.mkdir(parents=True,exist_ok=True)
             
             
